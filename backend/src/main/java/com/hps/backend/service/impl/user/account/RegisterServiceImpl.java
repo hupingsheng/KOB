@@ -62,7 +62,7 @@ public class RegisterServiceImpl implements RegisterService {
         userMapper.insert(user);
 
 
-        map.put("error_message", "操作成功");
+        map.put("error_message", "success");
         return map;
     }
 
