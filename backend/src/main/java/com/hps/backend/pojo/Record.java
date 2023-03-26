@@ -3,6 +3,7 @@ package com.hps.backend.pojo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,25 +13,25 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Bot {
-
+public class Record {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
-    private Integer userId;
+    private Integer aId;
+    private Integer aSx;
+    private Integer aSy;
 
-    private String title;
+    private Integer bId;
+    private Integer bSx;
+    private Integer bSy;
 
-    private String description;
+    private String aSteps;
+    private String bSteps;
 
-    private String content;
+    private String map;
 
-    private Integer rating;
+    private String loser;
 
-    //设置日期的展示格式
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "Asia/Shanghai")
     private Date createtime;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "Asia/Shanghai")
-    private Date modifytime;
 }
