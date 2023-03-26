@@ -12,5 +12,7 @@ public class Player {
 
     private Integer rating;
 
+    private Integer botId;
+
     private Integer waitingTime;  //玩家的等待时间
 }

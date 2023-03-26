@@ -15,6 +15,11 @@ public class Player {
 
     //玩家id   玩家的起始位置sx,sy
     private Integer id;
+
+    private Integer botId;   //-1 表示亲自出马   否则表示用AI执行
+
+    private String botCode;
+
     private Integer sx;
     private Integer sy;
 

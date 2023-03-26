@@ -57,7 +57,7 @@ public class AddServiceImpl implements AddService {
             map.put("error_message", "Bot的代码不能为空");
             return map;
         }
-        if (content.length() > 100) {
+        if (content.length() > 10000) {
             map.put("error_message", "Bot的代码长度不能超过10000");
             return map;
         }
