@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.hps.backend.consumer.WebSocketServer;
 import com.hps.backend.pojo.Bot;
 import com.hps.backend.pojo.Record;
+import com.hps.backend.pojo.User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -80,18 +81,18 @@ public class Game extends Thread {
         Integer botIdA = -1, botIdB = -1;
         String botCodeA = "", botCodeB = "";
 
-        if(botA != null){
+        if (botA != null) {
             botIdA = botA.getId();
             botCodeA = botA.getContent();
         }
 
-        if(botB != null){
+        if (botB != null) {
             botIdB = botB.getId();
             botCodeB = botB.getContent();
         }
 
-        playerA = new Player(idA, botIdA, botCodeA,rows - 2, 1, new ArrayList<>());
-        playerB = new Player(idB, botIdB, botCodeB,1, cols - 2, new ArrayList<>());
+        playerA = new Player(idA, botIdA, botCodeA, rows - 2, 1, new ArrayList<>());
+        playerB = new Player(idB, botIdB, botCodeB, 1, cols - 2, new ArrayList<>());
     }
 
     public int[][] getG() {
@@ -176,17 +177,18 @@ public class Game extends Thread {
 
     /**
      * 将当前的局面信息编码成一个字符串
+     *
      * @param player
      * @return
      */
-    private String getInput(Player player){
+    private String getInput(Player player) {
         //地图 + 自己的起始坐标 + 自己的操作序列 + 对手的起始坐标 + 对手的操作序列
         Player me, you;
 
-        if(playerA.getId().equals(player.getId())){
+        if (playerA.getId().equals(player.getId())) {
             me = playerA;
             you = playerB;
-        }else {
+        } else {
             me = playerB;
             you = playerA;
         }
@@ -197,20 +199,21 @@ public class Game extends Thread {
                 me.getStepsString() + ")#" +
                 you.getSx() + "#" +
                 you.getSy() + "#(" +
-                you.getStepsString() +")";
+                you.getStepsString() + ")";
     }
 
-    private void sendBotCode(Player player){
-        if(player.getBotId().equals(-1)) return;     //亲自出马，不需要AI
+    private void sendBotCode(Player player) {
+        if (player.getBotId().equals(-1)) return;     //亲自出马，不需要AI
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
-        data.add("user_id",player.getId().toString());
+        data.add("user_id", player.getId().toString());
         data.add("bot_code", player.getBotCode());
-        data.add("input",getInput(player));
+        data.add("input", getInput(player));
         WebSocketServer.restTemplate.postForObject(addBotUrl, data, String.class);
     }
 
     /**
      * 等待两名玩家的下一步操作
+     *
      * @return
      */
     private boolean nextStep() {
@@ -255,10 +258,31 @@ public class Game extends Thread {
         return res.toString();
     }
 
+    private void updateUserRating(Player player, Integer rating) {
+        User user = WebSocketServer.userMapper.selectById(player.getId());
+        user.setRating(rating);
+        WebSocketServer.userMapper.updateById(user);
+    }
+
     /**
      * 将对局结果保存到数据库
      */
     public void saveToDataBase() {
+
+        Integer ratingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRating();
+        Integer ratingB = WebSocketServer.userMapper.selectById(playerB.getId()).getRating();
+
+        if ("A".equals(loser)){
+            ratingA -= 2;
+            ratingB += 5;
+        }else if("B".equals(loser)) {
+            ratingA += 5;
+            ratingB -= 2;
+        }
+
+        updateUserRating(playerA, ratingA);
+        updateUserRating(playerB, ratingB);
+
         Record record = new Record(
                 null,
                 playerA.getId(),
